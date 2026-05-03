@@ -18,6 +18,22 @@ This repository is the public developer and marketing showcase for the MyMusik m
 - Hosted Angular client ZIP: [mymusik_angular_client.zip](https://shaggai.net/angular_client/client/mymusik_angular_client.zip)
 - Generated Python client: [`clients/python`](clients/python)
 
+## Table Of Contents
+
+- [What You Can Build](#what-you-can-build)
+- [Screenshots](#screenshots)
+- [Quick Start](#quick-start)
+- [AI Voice Command System](#ai-voice-command-system)
+- [Custom Prompt](#custom-prompt)
+- [AI-Available Context](#ai-available-context)
+- [AI And Player Capabilities](#ai-and-player-capabilities)
+- [API QR Code And Device Control](#api-qr-code-and-device-control)
+- [Python Client](#python-client)
+- [Angular Client](#angular-client)
+- [API Shape](#api-shape)
+- [Security Note](#security-note)
+- [Repository Contents](#repository-contents)
+
 ## What You Can Build
 
 MyMusik turns a device into local music infrastructure for playback, sync, and automation. The HTTP API can be used to:
@@ -26,6 +42,78 @@ MyMusik turns a device into local music infrastructure for playback, sync, and a
 - Trigger imports, cover art updates, selective sync, encrypted backup flows, and device jobs.
 - Connect AI command flows to deterministic local music actions.
 - Build dashboards, custom player UIs, network controllers, library tools, and automation scripts.
+
+## Screenshots
+
+| Album view | Song details | AI controls |
+| --- | --- | --- |
+| ![Album view](assets/screenshots/album-view.png) | ![Song details](assets/screenshots/song-details.png) | ![AI controls](assets/screenshots/ai-controls.png) |
+
+| Search | Insights | Synchronization | API QR device connection |
+| --- | --- | --- | --- |
+| ![Search with selection](assets/screenshots/search-with-selection.png) | ![Insights](assets/screenshots/insights.png) | ![Synchronization](assets/screenshots/synchronization.png) | ![API QR device connection](assets/screenshots/api-qr-code.png) |
+
+## Quick Start
+
+Open the hosted Swagger reference for the easiest API tour:
+
+```text
+https://mymusik.app/swagger/
+```
+
+After downloading and starting MyMusik, open the local in-app Swagger reference here:
+
+```text
+http://localhost:7790/ui/swagger
+```
+
+When MyMusik is running locally, the API server defaults to:
+
+```text
+http://localhost:7790/api
+```
+
+Example request with an access token:
+
+```bash
+curl -H "Authorization: Bearer $MYMUSIK_TOKEN" \
+  http://localhost:7790/api/player
+```
+
+Start playback for selected songs. These shell examples use `jq` to turn the returned song array into the `SongList` body expected by the player endpoints.
+
+```bash
+export MYMUSIK_TOKEN="YOUR_ACCESS_TOKEN"
+export MYMUSIK_API="http://localhost:7790/api"
+
+curl -s -H "Authorization: Bearer $MYMUSIK_TOKEN" \
+  "$MYMUSIK_API/song?sortBy=name&orderBy=ASC&pageIndex=0" \
+  | jq '{ id: "", songs: .[0:3] }' \
+  | curl -X POST "$MYMUSIK_API/player/playsongs" \
+      -H "Authorization: Bearer $MYMUSIK_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data-binary @-
+```
+
+Queue songs without interrupting the current track:
+
+```bash
+curl -s -H "Authorization: Bearer $MYMUSIK_TOKEN" \
+  "$MYMUSIK_API/song?sortBy=created&orderBy=DESC&pageIndex=0" \
+  | jq '{ id: "", songs: .[0:10] }' \
+  | curl -X POST "$MYMUSIK_API/queueitem/addsongs" \
+      -H "Authorization: Bearer $MYMUSIK_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data-binary @-
+```
+
+Basic player controls:
+
+```bash
+curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/player/startstoptoggleplaying"
+curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/player/nexttrack"
+curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/queueitem/clear"
+```
 
 ## AI Voice Command System
 
@@ -100,78 +188,6 @@ The same API surface used by scripts and generated clients can also be exposed t
 A device running MyMusik can host the local API and show an API QR code. Another phone, tablet, or browser on the allowed network can scan that QR code to open the hosted device's MyMusik controller UI/API connection, making it possible to browse or control the music player from a second device.
 
 API QR access still depends on the same security model as the HTTP API: the server is local by default, bearer tokens protect access, and remote/network exposure should only be enabled deliberately in settings.
-
-## Screenshots
-
-| Album view | Song details | AI controls |
-| --- | --- | --- |
-| ![Album view](assets/screenshots/album-view.png) | ![Song details](assets/screenshots/song-details.png) | ![AI controls](assets/screenshots/ai-controls.png) |
-
-| Search | Insights | Synchronization | API QR device connection |
-| --- | --- | --- | --- |
-| ![Search with selection](assets/screenshots/search-with-selection.png) | ![Insights](assets/screenshots/insights.png) | ![Synchronization](assets/screenshots/synchronization.png) | ![API QR device connection](assets/screenshots/api-qr-code.png) |
-
-## Quick Start
-
-Open the hosted Swagger reference for the easiest API tour:
-
-```text
-https://mymusik.app/swagger/
-```
-
-After downloading and starting MyMusik, open the local in-app Swagger reference here:
-
-```text
-http://localhost:7790/ui/swagger
-```
-
-When MyMusik is running locally, the API server defaults to:
-
-```text
-http://localhost:7790/api
-```
-
-Example request with an access token:
-
-```bash
-curl -H "Authorization: Bearer $MYMUSIK_TOKEN" \
-  http://localhost:7790/api/player
-```
-
-Start playback for selected songs. These shell examples use `jq` to turn the returned song array into the `SongList` body expected by the player endpoints.
-
-```bash
-export MYMUSIK_TOKEN="YOUR_ACCESS_TOKEN"
-export MYMUSIK_API="http://localhost:7790/api"
-
-curl -s -H "Authorization: Bearer $MYMUSIK_TOKEN" \
-  "$MYMUSIK_API/song?sortBy=name&orderBy=ASC&pageIndex=0" \
-  | jq '{ id: "", songs: .[0:3] }' \
-  | curl -X POST "$MYMUSIK_API/player/playsongs" \
-      -H "Authorization: Bearer $MYMUSIK_TOKEN" \
-      -H "Content-Type: application/json" \
-      --data-binary @-
-```
-
-Queue songs without interrupting the current track:
-
-```bash
-curl -s -H "Authorization: Bearer $MYMUSIK_TOKEN" \
-  "$MYMUSIK_API/song?sortBy=created&orderBy=DESC&pageIndex=0" \
-  | jq '{ id: "", songs: .[0:10] }' \
-  | curl -X POST "$MYMUSIK_API/queueitem/addsongs" \
-      -H "Authorization: Bearer $MYMUSIK_TOKEN" \
-      -H "Content-Type: application/json" \
-      --data-binary @-
-```
-
-Basic player controls:
-
-```bash
-curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/player/startstoptoggleplaying"
-curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/player/nexttrack"
-curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/queueitem/clear"
-```
 
 ## Python Client
 
