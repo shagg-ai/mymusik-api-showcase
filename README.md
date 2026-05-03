@@ -6,9 +6,9 @@
 
 **Your music. Your library. Everywhere.**
 
-MyMusik is a modern music player for owned music libraries. It brings streaming-level convenience to personal MP3, WAV, FLAC, and local audio collections while keeping users in control of their files, metadata, tags, playlists, sync, backup, and privacy.
+MyMusik is a modern music player for owned music libraries. It brings streaming-level convenience to personal MP3, WAV, FLAC, and local audio collections while keeping users in control of their files, metadata, tags, playlists, sync, backup, playback history, listening metrics, and privacy.
 
-This repository is the public developer and marketing showcase for the MyMusik music-player API. It is not the full MyMusik app source code.
+This repository is the public developer and marketing showcase for the MyMusik music-player API, generated clients, and local-device control workflows. It is not the full MyMusik app source code.
 
 - Website: [mymusik.app](https://mymusik.app/)
 - Hosted Swagger/API reference: [mymusik.app/swagger](https://mymusik.app/swagger/)
@@ -20,6 +20,7 @@ This repository is the public developer and marketing showcase for the MyMusik m
 
 ## Table Of Contents
 
+- [Supported Platforms](#supported-platforms)
 - [What You Can Build](#what-you-can-build)
 - [Screenshots](#screenshots)
 - [Quick Start](#quick-start)
@@ -28,20 +29,43 @@ This repository is the public developer and marketing showcase for the MyMusik m
 - [AI-Available Context](#ai-available-context)
 - [AI And Player Capabilities](#ai-and-player-capabilities)
 - [API QR Code And Device Control](#api-qr-code-and-device-control)
+- [Generated Client Coverage](#generated-client-coverage)
 - [Python Client](#python-client)
 - [Angular Client](#angular-client)
 - [API Shape](#api-shape)
 - [Security Note](#security-note)
 - [Repository Contents](#repository-contents)
+- [Suggested Repo Improvements](#suggested-repo-improvements)
+
+## Supported Platforms
+
+MyMusik currently runs on:
+
+- Windows
+- Linux
+- Android
+- Browser
+
+iOS support is planned. The website offers a direct Windows installer, a Linux AppImage, Android installation through Google Play, and a signed Android APK with checksum. Browser access is useful for API docs, dashboards, and controller UIs that connect to a MyMusik device on your allowed network.
+
+Download links:
+
+- Windows installer: [MyMusik.exe](https://shaggai.net/repo/installers/client/MyMusik.exe)
+- Linux AppImage: [MyMusik.AppImage](https://shaggai.net/linux/client/MyMusik.AppImage)
+- Android on Google Play: [MyMusik for Android](https://play.google.com/store/apps/details?id=com.shaggai.mymusik&hl=en)
+- Signed Android APK: [latest.apk](https://shaggai.net/android/client/apk/latest.apk)
+- APK SHA-256 checksum: [latest.apk.sha256](https://shaggai.net/android/client/apk/latest.apk.sha256)
 
 ## What You Can Build
 
 MyMusik turns a device into local music infrastructure for playback, sync, and automation. The HTTP API can be used to:
 
-- Control playback, queue state, playlists, albums, songs, ratings, tags, lyrics, and metadata.
-- Trigger imports, cover art updates, selective sync, encrypted backup flows, and device jobs.
-- Connect AI command flows to deterministic local music actions.
-- Build dashboards, custom player UIs, network controllers, library tools, and automation scripts.
+- Control playback, queue state, playlists, albums, songs, ratings, tags, lyrics, comments, and metadata.
+- Trigger audio imports, audio cut/extract workflows, cover art updates, selective sync, encrypted backup flows, and device jobs.
+- Build dashboards for library status, cloud/storage usage, listening metrics, model usage, sync state, and backup monitoring.
+- Connect AI command flows to deterministic local music actions with custom prompts and selectable function permissions.
+- Use one device as the MyMusik host while other devices browse or control it through the API, browser UI, or QR/device-linking workflow.
+- Build custom player UIs, network controllers, library tools, community/comment workflows, and local automation scripts.
 
 ## Screenshots
 
@@ -189,6 +213,26 @@ A device running MyMusik can host the local API and show an API QR code. Another
 
 API QR access still depends on the same security model as the HTTP API: the server is local by default, bearer tokens protect access, and remote/network exposure should only be enabled deliberately in settings.
 
+## Generated Client Coverage
+
+This showcase includes generated clients for two common integration styles:
+
+- Python client: useful for scripts, small services, local automation, scheduled jobs, data export, and custom music tooling.
+- Angular client: useful for dashboards, admin panels, browser controllers, and custom music-player interfaces on top of a hosted MyMusik device.
+
+Useful generated service groups include:
+
+| Area | Generated services |
+| --- | --- |
+| Playback and queue | `PlayerService`, `QueueItemService`, `PlayHistoryService`, `PlayLogService` |
+| Library browsing and editing | `SongService`, `AlbumService`, `ArtistService`, `PlaylistService`, `PlaylistItemService`, `MusicElementService` |
+| Search and organization | `MusicSearchService`, `TagService`, `LyricService`, `CommentService`, `FilterService`, `ConditionService` |
+| Import and file workflows | `AudioImportService`, `AudioEditService`, `AudioFileService`, `ImageFileService`, `ImageUrlImportService`, `LocalStorageService` |
+| Sync, cloud, and backup | `SynchronisationService`, `CloudService`, `CloudStorageService`, `CloudUploadService`, `CloudDownloadService`, `AlbumCloudService` |
+| Metrics and usage | `SongMetricsService`, `AlbumMetricsService`, `ArtistMetricsService`, `PlaylistMetricsService`, `ModelUsageService` |
+| Device, auth, and settings | `DeviceService`, `LoginService`, `TokenService`, `UserProfileService`, `SettingService`, `ConfigSectionService` |
+| AI command flow | `AiMusicVoiceCommandService`, `AiUserService`, `TemporaryMessageService` |
+
 ## Python Client
 
 The generated Python client is included under [`clients/python`](clients/python) as the `mymusik_client` package. Install it locally:
@@ -314,6 +358,17 @@ docs/                     Short integration docs
 assets/logo_black.svg     MyMusik logo used by this README
 assets/screenshots/       Public marketing screenshots
 ```
+
+## Suggested Repo Improvements
+
+These are useful next steps for making the public showcase easier to evaluate and integrate:
+
+- Add README badges for license, OpenAPI version, generated Python client, generated Angular client, and supported platforms.
+- Add an `examples/` folder with small runnable Python and Angular examples for playback, queue edits, search, and QR/device-control workflows.
+- Add `docs/device-control-qr.md` with QR setup steps, same-network expectations, token handling, remote-access cautions, and troubleshooting.
+- Add one client-regeneration document that covers both Angular and Python generation commands from `openapi/doc.json`.
+- Add an endpoint capability matrix grouped by playback, queue, library, sync, cloud/storage, AI commands, metrics, and settings.
+- Add release notes or a generated timestamp for `openapi/doc.json` and the generated clients so developers can see which app/API build the showcase reflects.
 
 ## License
 
