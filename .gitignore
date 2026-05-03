@@ -1,0 +1,43 @@
+# Secrets and local machine config
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+id_rsa
+id_ed25519
+
+# Dependencies and generated build output
+node_modules/
+dist/
+build/
+out/
+coverage/
+.angular/
+.cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.tox/
+.mypy_cache/
+
+# Local editor/OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Package output
+*.zip
+*.tar.gz
+*.whl
+*.egg-info/
+
+# Private deployment artifacts
+microsoft-store-upload/
+installer/
+*.msix
+*.appinstaller
