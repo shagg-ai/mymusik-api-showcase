@@ -35,7 +35,6 @@ This repository is the public developer and marketing showcase for the MyMusik m
 - [API Shape](#api-shape)
 - [Security Note](#security-note)
 - [Repository Contents](#repository-contents)
-- [Suggested Repo Improvements](#suggested-repo-improvements)
 
 ## Supported Platforms
 
@@ -358,17 +357,6 @@ docs/                     Short integration docs
 assets/logo_black.svg     MyMusik logo used by this README
 assets/screenshots/       Public marketing screenshots
 ```
-
-## Suggested Repo Improvements
-
-These are useful next steps for making the public showcase easier to evaluate and integrate:
-
-- Add README badges for license, OpenAPI version, generated Python client, generated Angular client, and supported platforms.
-- Add an `examples/` folder with small runnable Python and Angular examples for playback, queue edits, search, and QR/device-control workflows.
-- Add `docs/device-control-qr.md` with QR setup steps, same-network expectations, token handling, remote-access cautions, and troubleshooting.
-- Add one client-regeneration document that covers both Angular and Python generation commands from `openapi/doc.json`.
-- Add an endpoint capability matrix grouped by playback, queue, library, sync, cloud/storage, AI commands, metrics, and settings.
-- Add release notes or a generated timestamp for `openapi/doc.json` and the generated clients so developers can see which app/API build the showcase reflects.
 
 ## License
 
