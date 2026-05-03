@@ -16,6 +16,7 @@ This repository is the public developer and marketing showcase for the MyMusik m
 - Local API default: `http://localhost:7790/api`
 - OpenAPI spec: [`openapi/doc.json`](openapi/doc.json)
 - Hosted Angular client ZIP: [mymusik_angular_client.zip](https://shaggai.net/angular_client/client/mymusik_angular_client.zip)
+- Generated Python client: [`clients/python`](clients/python)
 
 ## What You Can Build
 
@@ -98,25 +99,48 @@ curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/player/next
 curl -X POST -H "Authorization: Bearer $MYMUSIK_TOKEN" "$MYMUSIK_API/queueitem/clear"
 ```
 
-## Python Example
+## Python Client
 
-The OpenAPI spec can generate a Python client. If you use the hosted Python package ZIP, configure it for the local MyMusik API:
+The generated Python client is included under [`clients/python`](clients/python) as the `mymusik_client` package. Install it locally:
 
-```python
-import openapi_client
-
-configuration = openapi_client.Configuration(
-    host="http://localhost:7790/api",
-    access_token="YOUR_ACCESS_TOKEN"
-)
-
-with openapi_client.ApiClient(configuration) as api_client:
-    player_api = openapi_client.PlayerApi(api_client)
-    players = player_api.service_player_get_page()
-    print(players)
+```bash
+cd clients/python
+python -m pip install -e .
 ```
 
-See [`clients/python`](clients/python) for the hosted package link and regeneration notes.
+Then configure it for your local MyMusik API:
+
+```python
+import mymusik_client
+
+configuration = mymusik_client.Configuration(
+    host="http://localhost:7790/api",
+    access_token="YOUR_ACCESS_TOKEN",
+)
+
+with mymusik_client.ApiClient(configuration) as api_client:
+    songs_api = mymusik_client.SongApi(api_client)
+    player_api = mymusik_client.PlayerApi(api_client)
+    queue_api = mymusik_client.QueueItemApi(api_client)
+
+    songs = songs_api.service_song_get_page(sort_by="name", order_by="ASC", page_index=0)
+
+    player_api.service_player_play_songs(
+        song_list=mymusik_client.SongList(id="", songs=songs[:3])
+    )
+
+    queue_api.service_queue_item_add_songs(
+        song_list=mymusik_client.SongList(id="", songs=songs[3:10])
+    )
+
+    player_api.service_player_next_track()
+```
+
+The website also links the hosted Python client ZIP here:
+
+```text
+https://shaggai.net/python_client/client/mymusik_python_client.zip
+```
 
 ## Angular Client
 
@@ -195,7 +219,7 @@ The API is protected with bearer access tokens. Remote access is disabled by def
 ```text
 openapi/doc.json          OpenAPI 3.0.2 spec for the MyMusik music-player API
 clients/angular/          Generated Angular/TypeScript API client
-clients/python/           Hosted Python client link and generation notes
+clients/python/           Generated Python API client
 docs/                     Short integration docs
 assets/logo_black.svg     MyMusik logo used by this README
 assets/screenshots/       Public marketing screenshots
