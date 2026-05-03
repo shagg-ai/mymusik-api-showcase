@@ -27,15 +27,89 @@ MyMusik turns a device into local music infrastructure for playback, sync, and a
 - Connect AI command flows to deterministic local music actions.
 - Build dashboards, custom player UIs, network controllers, library tools, and automation scripts.
 
+## AI Voice Command System
+
+MyMusik includes an AI voice-command flow for controlling the music player through deterministic app actions. The app records a voice command, transcribes it, builds a prompt with current library and player context, asks the selected AI model to generate JavaScript, and stores the result until the frontend executes it through the initialized `aiMusicController`.
+
+The generated script is constrained to a single runnable `run(aiMusicController)` function. The AI is instructed to use only the functions listed in the API description JSON that the frontend provides for the current command, so voice commands can be connected to real player, queue, playlist, search, sync, and library operations instead of free-form text output.
+
+Voice-command lifecycle endpoints include:
+
+- `POST /aimusicvoicecommand/startvoicerecording`
+- `POST /aimusicvoicecommand/stopvoicerecording`
+- `POST /aimusicvoicecommand/stopanddeletevoicerecording`
+- `POST /aimusicvoicecommand/{id}/retryscriptgeneration`
+- `POST /aimusicvoicecommand/report`
+
+## Custom Prompt
+
+The AI script system prompt is customizable in MyMusik settings through `scriptSystemPrompt`. If no custom value is configured, MyMusik uses this default prompt:
+
+```text
+You write JavaScript code for a music app.
+A variable named aiMusicController is provided and already initialized.
+Output only raw JavaScript code.
+Do not output markdown or explanations.
+You must define exactly one function with this first line:
+async function run(aiMusicController) {
+
+Rules:
+1. Use only methods listed in API description json.
+2. Call methods with the exact parameter style from API description.
+3. Do not pass object literals to positional methods.
+4. Guard every result before reading result.data.
+5. Result data can be arrays or nested objects.
+6. Do not import modules and do not use browser globals.
+7. Do not construct fake Song, Album, Playlist, QueueItem, or Tag objects.
+8. If recent play log contains song identifiers and the user refers to a recent song, prefer identifier based methods.
+9. For generic play requests, search from transcript text and try multiple query variants.
+10. Return nothing from run.
+```
+
+For each command, MyMusik also wraps the transcript with per-request instructions:
+
+- Generate raw JavaScript only.
+- Return exactly one runnable function named `run`.
+- If the request is unclear, return runnable code and throw `Error` inside `run`.
+- If `run` throws `Error`, the message should use the system language.
+- Treat the transcript as the primary source.
+- Use recent play log and history when the user says things like "previous", "last", or "that song".
+- Prefer direct identifier-based methods when the API provides them.
+
+## AI-Available Context
+
+The system prompt can include JSON context that helps the AI resolve natural-language requests into exact API actions:
+
+- Current player state, including current song, playback state, position, duration, volume, mute state, random mode, playback mode, playback rate, and container id.
+- Recent play history for resolving references to earlier tracks.
+- Most played songs and recently added songs.
+- Important playlists and recently added playlists.
+- Frontend information for the current screen, selected item, or active workflow.
+- API description JSON that lists the functions and parameter styles available to `aiMusicController`.
+
+## AI And Player Capabilities
+
+The same API surface used by scripts and generated clients can also be exposed to AI command flows:
+
+- Playback: `POST /player/play`, `POST /player/playsongs`, `POST /player/startplaying`, `POST /player/stopplaying`, `POST /player/startstoptoggleplaying`, `POST /player/nexttrack`, `POST /player/prevtrack`, `POST /player/seek`, `POST /player/setplaybackrate`.
+- Queue: `POST /queueitem/addsongs`, `POST /queueitem/addalbum`, `POST /queueitem/addcontainer`, `POST /queueitem/playsongsnext`, `POST /queueitem/playsongsafternext`, `POST /queueitem/setqueuewithsongs`, `POST /queueitem/setqueuewithalbums`, `POST /queueitem/shuffle`, `POST /queueitem/clear`, `POST /queueitem/removemultiple`, `POST /queueitem/skipitemsupto`.
+- Library workflows: songs, albums, playlists, music search, tags, lyrics, metadata editing, audio import, synchronization, cloud backup, storage status, and listening metrics.
+
+## API QR Code And Device Control
+
+A device running MyMusik can host the local API and show an API QR code. Another phone, tablet, or browser on the allowed network can scan that QR code to open the hosted device's MyMusik controller UI/API connection, making it possible to browse or control the music player from a second device.
+
+API QR access still depends on the same security model as the HTTP API: the server is local by default, bearer tokens protect access, and remote/network exposure should only be enabled deliberately in settings.
+
 ## Screenshots
 
 | Album view | Song details | AI controls |
 | --- | --- | --- |
 | ![Album view](assets/screenshots/album-view.png) | ![Song details](assets/screenshots/song-details.png) | ![AI controls](assets/screenshots/ai-controls.png) |
 
-| Search | Insights | Synchronization |
-| --- | --- | --- |
-| ![Search with selection](assets/screenshots/search-with-selection.png) | ![Insights](assets/screenshots/insights.png) | ![Synchronization](assets/screenshots/synchronization.png) |
+| Search | Insights | Synchronization | API QR device connection |
+| --- | --- | --- | --- |
+| ![Search with selection](assets/screenshots/search-with-selection.png) | ![Insights](assets/screenshots/insights.png) | ![Synchronization](assets/screenshots/synchronization.png) | ![API QR device connection](assets/screenshots/api-qr-code.png) |
 
 ## Quick Start
 
